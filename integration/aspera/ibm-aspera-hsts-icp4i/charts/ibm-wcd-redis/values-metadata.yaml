@@ -1,0 +1,581 @@
+---
+arch:
+  __metadata:
+    label: Architecture scheduling preferences
+    description: Config for arch
+  amd64:
+    __metadata:
+      label: Scheduling preference - amd64
+      description: Architecture preference for target worker node.
+      options:
+      - label: 3 - Most preferred
+        value: 3 - Most preferred
+      - label: 0 - Do not use
+        value: 0 - Do not use
+      - label: 1 - Least preferred
+        value: 1 - Least preferred
+      - label: 2 - No preference
+        value: 2 - No preference
+      name: amd64
+      type: string
+      immutable: false
+      required: true
+image:
+  __metadata:
+    label: Docker image configuration
+    description: Config for image
+  repository:
+    __metadata:
+      label: Docker repository
+      description: Docker registry to pull image from.
+      name: repository
+      type: string
+      immutable: false
+      required: true
+  name:
+    __metadata:
+      label: Name
+      description: Description for name
+      type: string
+      required: false
+      hidden: false
+      immutable: false
+  tag:
+    __metadata:
+      label: Tag
+      description: Docker image tag to pull
+      name: tag
+      type: string
+      immutable: false
+      required: true
+  pullPolicy:
+    __metadata:
+      label: Docker image pull policy
+      description: Always, Never, or IfNotPresent. Defaults to IfNotPresent
+      options:
+      - label: Always
+        value: Always
+      - label: Never
+        value: Never
+      - label: IfNotPresent
+        value: IfNotPresent
+      name: pullPolicy
+      type: string
+      immutable: false
+      required: true
+  pullSecret:
+    __metadata:
+      label: Docker registry pull secret.
+      description: Docker pull secret to be used for downloading the images. Leave
+        empty for the defeault one.
+      type: string
+      required: false
+      hidden: false
+      immutable: false
+      name: pullSecret
+pullSecretTemplate:
+  __metadata:
+    label: Pull Secret Template
+    description: Description for pullSecretTemplate
+    type: string
+    required: false
+    hidden: false
+    immutable: false
+replicas:
+  __metadata:
+    label: Cluster configuration
+    description: Config for replicas
+  servers:
+    __metadata:
+      label: Server replicas
+      description: Number of server replicas to deploy. Defaults to 3
+      type: number
+      required: true
+      hidden: false
+      immutable: false
+      name: servers
+  sentinels:
+    __metadata:
+      label: Sentinels replicas
+      description: Number of sentinel replicas to deploy. Defaults to 3
+      type: number
+      required: true
+      hidden: false
+      immutable: false
+      name: sentinels
+password:
+  __metadata:
+    label: password
+    description: 'provide password for the user redis, default: redispassword'
+    type: string
+    required: true
+    hidden: false
+    immutable: false
+    name: password
+passwordTemplate:
+  __metadata:
+    label: password template
+    description: 'Helm template used to generate the password. Useful only if redis
+      is a subchart. default: ""'
+    type: string
+    required: false
+    hidden: false
+    immutable: true
+    name: passwordTemplate
+cachemode:
+  __metadata:
+    label: cache mode
+    description: yes - to enable redis in cache mode, no - to enable redis in storage
+      mode
+    type: string
+    required: true
+    hidden: false
+    immutable: false
+    name: cachemode
+appendonly:
+  __metadata:
+    label: AOF
+    description: no - to turn off AOF, AOF need to be turned off when the data needs
+      to be restored in redis, yes - to turn on AOF
+    type: string
+    required: true
+    hidden: false
+    immutable: false
+    name: appendonly
+timeout:
+  __metadata:
+    label: timeout
+    description: Close the connection after a client is idle for N seconds (0 to disable)
+    type: number
+    required: true
+    hidden: false
+    immutable: false
+    name: timeout
+notifyKeyspaceEvents:
+  __metadata:
+    label: Notify Keyspace Events
+    description: Description for notifyKeyspaceEvents
+    type: string
+    required: false
+    hidden: false
+    immutable: false
+tcpKeepAlive:
+  __metadata:
+    label: Tcp Keep Alive
+    description: 'Send TCP ACKs to clients every N seconds in absence of communication,
+      default: 300'
+    type: number
+    required: true
+    hidden: false
+    immutable: false
+    name: tcpKeepAlive
+luaTimeLimit:
+  __metadata:
+    label: Lua Time Limit
+    description: 'Max execution time of a Lua script in milliseconds, default: 5000'
+    type: number
+    required: true
+    hidden: false
+    immutable: false
+    name: luaTimeLimit
+slowlogLogSlowerThan:
+  __metadata:
+    label: Slowlog Log Slower Than
+    description: 'The execution time, in microseconds, that commands must exceed in
+      order to get logged in the slowlog, default: 10000'
+    type: number
+    required: true
+    hidden: false
+    immutable: false
+    name: slowlogLogSlowerThan
+slowlogMaxLen:
+  __metadata:
+    label: Slowlog Max Length
+    description: default 120, The maximum length of the slow log
+    type: number
+    required: true
+    hidden: false
+    immutable: false
+    name: slowlogMaxLen
+persistence:
+  __metadata:
+    label: Persistent Volume configuration
+    description: Config for persistence
+  enabled:
+    __metadata:
+      label: Enable Persistent Volume, PV need to be enabled when data needs to be
+        restored from dump file
+      description: Enable Persistent Volume, true or false
+      type: boolean
+      required: true
+      hidden: false
+      immutable: false
+      name: enabled
+  useDynamicProvisioning:
+    __metadata:
+      label: Use dynamic provisioning
+      description: Select this checkbox to allow the cluster to automatically provision
+        new storage resource and create PersistentVolume objects.
+  accessMode:
+    __metadata:
+      label: Persistent Volume Access Mode
+      description: The mode in which persistent volume should be accessed
+      type: string
+      required: true
+      hidden: false
+      immutable: false
+      name: accessMode
+  storageClassName:
+    __metadata:
+      label: Storage Class Name
+      description: The name of StorageClass to be used to create persistent volume
+        claim
+      type: string
+      required: false
+      hidden: false
+      immutable: false
+      name: storageClassName
+  size:
+    __metadata:
+      label: PV Storage Size
+      description: Storage Size for persistent volume to be created
+      type: string
+      required: true
+      hidden: false
+      immutable: false
+      name: size
+master:
+  __metadata:
+    label: Master node configuration
+    description: Config for master
+  livenessProbe:
+    initialDelaySeconds:
+      __metadata:
+        label: Liveness probe initial delay seconds
+        description: Number of seconds after the container has started before the
+          probe is initiated.
+        type: number
+        required: true
+        hidden: false
+        immutable: false
+        name: initialDelaySeconds
+    periodSeconds:
+      __metadata:
+        label: Liveness probe period seconds
+        description: How often (in seconds) to perform the probe.
+        type: number
+        required: true
+        hidden: false
+        immutable: false
+        name: periodSeconds
+    timeoutSeconds:
+      __metadata:
+        label: Liveness probe timeout seconds
+        description: Number of seconds after which the probe times out.
+        type: number
+        required: true
+        hidden: false
+        immutable: false
+        name: timeoutSeconds
+    successThreshold:
+      __metadata:
+        label: Liveness probe success threshold
+        description: Minimum consecutive successes for the probe to be considered
+          successful after having failed.
+        type: number
+        required: true
+        hidden: false
+        immutable: false
+        name: successThreshold
+    failureThreshold:
+      __metadata:
+        label: Liveness probe failure threshold
+        description: Number of failures to accept before giving up and marking the
+          pod as Unready.
+        type: number
+        required: true
+        hidden: false
+        immutable: false
+        name: failureThreshold
+  readinessProbe:
+    initialDelaySeconds:
+      __metadata:
+        label: Readiness probe initial delay seconds
+        description: Number of seconds after the container has started before the
+          probe is initiated.
+        type: number
+        required: true
+        hidden: false
+        immutable: false
+        name: initialDelaySeconds
+    periodSeconds:
+      __metadata:
+        label: Readiness probe period seconds
+        description: How often (in seconds) to perform the probe.
+        type: number
+        required: true
+        hidden: false
+        immutable: false
+        name: periodSeconds
+    timeoutSeconds:
+      __metadata:
+        label: Readiness probe timeout seconds
+        description: Number of seconds after which the probe times out.
+        type: number
+        required: true
+        hidden: false
+        immutable: false
+        name: timeoutSeconds
+    successThreshold:
+      __metadata:
+        label: Readiness probe success threshold
+        description: Minimum consecutive successes for the probe to be considered
+          successful after having failed.
+        type: number
+        required: true
+        hidden: false
+        immutable: false
+        name: successThreshold
+    failureThreshold:
+      __metadata:
+        label: Readiness probe failure threshold
+        description: Number of failures to accept before giving up and restarting
+          the.
+        type: number
+        required: true
+        hidden: false
+        immutable: false
+        name: failureThreshold
+sentinel:
+  __metadata:
+    label: Sentinel node configuration
+    description: Config for sentinel
+  livenessProbe:
+    initialDelaySeconds:
+      __metadata:
+        label: Liveness probe initial delay seconds
+        description: Number of seconds after the container has started before the
+          probe is initiated.
+        type: number
+        required: true
+        hidden: false
+        immutable: false
+        name: initialDelaySeconds
+    periodSeconds:
+      __metadata:
+        label: Liveness probe period seconds
+        description: How often (in seconds) to perform the probe.
+        type: number
+        required: true
+        hidden: false
+        immutable: false
+        name: periodSeconds
+    timeoutSeconds:
+      __metadata:
+        label: Liveness probe timeout seconds
+        description: Number of seconds after which the probe times out.
+        type: number
+        required: true
+        hidden: false
+        immutable: false
+        name: timeoutSeconds
+    successThreshold:
+      __metadata:
+        label: Liveness probe success threshold
+        description: Minimum consecutive successes for the probe to be considered
+          successful after having failed.
+        type: number
+        required: true
+        hidden: false
+        immutable: false
+        name: successThreshold
+    failureThreshold:
+      __metadata:
+        label: Liveness probe failure threshold
+        description: Number of failures to accept before giving up and marking the
+          pod as Unready.
+        type: number
+        required: true
+        hidden: false
+        immutable: false
+        name: failureThreshold
+  readinessProbe:
+    initialDelaySeconds:
+      __metadata:
+        label: Readiness probe initial delay seconds
+        description: Number of seconds after the container has started before the
+          probe is initiated.
+        type: number
+        required: true
+        hidden: false
+        immutable: false
+        name: initialDelaySeconds
+    periodSeconds:
+      __metadata:
+        label: Readiness probe period seconds
+        description: How often (in seconds) to perform the probe.
+        type: number
+        required: true
+        hidden: false
+        immutable: false
+        name: periodSeconds
+    timeoutSeconds:
+      __metadata:
+        label: Readiness probe timeout seconds
+        description: Number of seconds after which the probe times out.
+        type: number
+        required: true
+        hidden: false
+        immutable: false
+        name: timeoutSeconds
+    successThreshold:
+      __metadata:
+        label: Readiness probe success threshold
+        description: Minimum consecutive successes for the probe to be considered
+          successful after having failed.
+        type: number
+        required: true
+        hidden: false
+        immutable: false
+        name: successThreshold
+    failureThreshold:
+      __metadata:
+        label: Readiness probe failure threshold
+        description: Number of failures to accept before giving up and restarting
+          the.
+        type: number
+        required: true
+        hidden: false
+        immutable: false
+        name: failureThreshold
+serverService:
+  __metadata:
+    label: Service configuration
+    description: Config for serverService
+  type:
+    __metadata:
+      label: Type
+      description: Type of service. Select 'LoadBalancer' to enable access from the
+        VPC
+      options:
+      - label: ClusterIP
+        value: ClusterIP
+      - label: NodePort
+        value: NodePort
+      - label: LoadBalancer
+        value: LoadBalancer
+      - label: ExternalName
+        value: ExternalName
+      name: type
+      type: string
+      immutable: false
+      required: true
+rbac:
+  __metadata:
+    label: RBAC roles and bindings
+    description: Config for rbac
+  create:
+    __metadata:
+      label: Create
+      description: Create RBAC roles and bindings
+      type: boolean
+      required: true
+      hidden: false
+      immutable: false
+      name: create
+serviceAccount:
+  __metadata:
+    label: Service account
+    description: Config for serviceAccount
+  create:
+    __metadata:
+      label: Create
+      description: Create a ServiceAccount
+      type: boolean
+      required: true
+      hidden: false
+      immutable: false
+      name: create
+  name:
+    __metadata:
+      label: Name
+      description: ServiceAccount name
+      type: string
+      required: false
+      hidden: false
+      immutable: false
+      name: name
+resources:
+  __metadata:
+    label: Resource configuration
+    description: Config for resources
+  server:
+    requests:
+      memory:
+        __metadata:
+          label: Memory request
+          description: The memory request
+          type: string
+          required: true
+          hidden: false
+          immutable: false
+      cpu:
+        __metadata:
+          label: CPU request
+          description: The requested CPU
+          type: string
+          required: true
+          hidden: false
+          immutable: false
+    limits:
+      memory:
+        __metadata:
+          label: Memory limit
+          description: The memory limit
+          type: string
+          required: true
+          hidden: false
+          immutable: false
+      cpu:
+        __metadata:
+          label: CPU limit
+          description: The CPU limit
+          type: string
+          required: true
+          hidden: false
+          immutable: false
+  sentinel:
+    requests:
+      memory:
+        __metadata:
+          label: Memory request
+          description: The memory request
+          type: string
+          required: true
+          hidden: false
+          immutable: false
+      cpu:
+        __metadata:
+          label: CPU request
+          description: The requested CPU
+          type: string
+          required: true
+          hidden: false
+          immutable: false
+    limits:
+      memory:
+        __metadata:
+          label: Memory limit
+          description: The memory limit
+          type: string
+          required: true
+          hidden: false
+          immutable: false
+      cpu:
+        __metadata:
+          label: CPU limit
+          description: The CPU limit
+          type: string
+          required: true
+          hidden: false
+          immutable: false

@@ -1,0 +1,34 @@
+
+image: gitlab-registry.aspera.us/tjmiller/helm-deploy:v2.9.1
+
+stages:
+  - test
+  - deploy
+
+variables:
+  CHART_SUBPATH: ./
+
+lint:
+  stage: test
+  tags:
+    - kubernetes
+  script:
+    - helm init --client-only
+    - helm repo add sch https://devops.gitlab.aspera.us/ibm-charts
+    - helm repo add aspera https://devops.gitlab.aspera.us/charts
+    - helm repo update
+    - helm dep up "$CHART_SUBPATH"
+    - helm lint "$CHART_SUBPATH"
+
+trigger:
+  stage: deploy
+  script:
+  - >-
+    curl -X POST
+    -F "token=$DEVOPS_CHARTS_TOKEN"
+    -F "ref=master"
+    -F "variables[CHART_REPO]=git@gitlab.aspera.us:${CI_PROJECT_PATH}.git"
+    -F "variables[CHART_SUBPATH]=$CHART_SUBPATH"
+    https://gitlab.aspera.us/api/v4/projects/2308/trigger/pipeline
+  only:
+    - master

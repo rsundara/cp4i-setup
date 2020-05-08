@@ -1,0 +1,45 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ar1
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+  - ReadWriteMany
+  nfs:
+    path: /data/ar1
+    server: 9.9.9.9
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: nfs
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ar2
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+  - ReadWriteMany
+  nfs:
+    path: /data/ar2
+    server: 9.9.9.9
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: nfs
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ar3
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+  - ReadWriteMany
+  nfs:
+    path: /data/ar3
+    server: 9.9.9.9
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: nfs

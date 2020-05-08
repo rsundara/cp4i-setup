@@ -1,0 +1,159 @@
+###############################################################################
+# Licensed Materials - Property of IBM.
+# Copyright IBM Corporation 2018. All Rights Reserved.
+# U.S. Government Users Restricted Rights - Use, duplication or disclosure
+# restricted by GSA ADP Schedule Contract with IBM Corp.
+#
+# Contributors:
+#  IBM Corporation - initial API and implementation
+###############################################################################
+
+# Specify architecture (amd64, ppc64le, s390x) and weight to be  used for scheduling as follows :
+#   0 - Do not use
+#   1 - Least preferred
+#   2 - No preference
+#   3 - Most preferred
+arch:
+  amd64: "3 - Most preferred"
+
+## Redis image version
+image:
+  repository: ""
+  name: aspera-redis
+  tag: 4.0.11
+  # Please build the image from the https://github.ibm.com/watson-foundation-services/watson-common-data-redis-image repo for this chart.
+  # use pullPolicy of Always if tag is latest
+  pullPolicy: Always
+  pullSecret: ""
+
+# pullSecretTemplate - Name of the helm template which will render the pullSecret. The pullSecretTemplate applies only if pullSecret is empty and pullSecretTemplate is non-empty
+pullSecretTemplate: ""
+
+replicas:
+  servers: 3
+  sentinels: 3
+
+## redis password
+password: ""
+
+## passwordTemplate - Name of the helm template which will render the redisPassword. The passwordTemplate is applied only if password is empty and passwordTemplate is non-empty
+passwordTemplate: ""
+
+cachemode: "no"
+#yes - to enable redis cache mode
+#no - to enable redis storage mode
+
+#configuration parameters
+appendonly: "yes"
+# no - to turn off AOF, AOF need to be turned off when the data needs to be restored in redis.
+# yes - to turn on AOF
+timeout: 0
+#default 0 (Close the connection after a client is idle for N seconds (0 to disable)).
+
+#default "" (disabled) (Notify Pub/Sub clients about events happening in the key space. Set to KEA to enable all notifications).
+notifyKeyspaceEvents: ""
+
+tcpKeepAlive: 300
+#default 300 (Send TCP ACKs to clients every N seconds in absence of communication).
+
+luaTimeLimit: 5000
+#default 5000 (Max execution time of a Lua script in milliseconds).
+
+slowlogLogSlowerThan: 10000
+#default 10000 (The execution time, in microseconds, that commands must exceed in order to get logged in the slowlog).
+
+slowlogMaxLen: 120
+#default 120 (The maximum length of the slow log).
+
+persistence:
+  ## Enable persistence using Persistent Volume Claims.
+  ##
+  enabled: false
+  useDynamicProvisioning: false
+  existingClaimName: ""
+
+  ## Persistent Volume Access Mode.
+  ##
+  accessMode: ReadWriteOnce
+
+  ## Persistant Volume Storage Class Name
+  storageClassName: "standard"
+#standard
+  ## Persistent Volume Storage Size.
+  ##
+  size: 2Gi
+
+
+##
+## Redis Master parameters
+##
+
+master:
+  ## Redis Master Liveness Probe
+  livenessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 5
+
+  ## Redis Master Readiness Probe
+  readinessProbe:
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    timeoutSeconds: 3
+    successThreshold: 1
+    failureThreshold: 3
+
+##
+## Redis Sentinel parameters
+##
+sentinel:
+  ## Redis Master Liveness Probe
+  livenessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 5
+
+  ## Redis Master Readiness Probe
+  readinessProbe:
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    timeoutSeconds: 3
+    successThreshold: 1
+    failureThreshold: 3
+
+serverService:
+  type: ClusterIP  # [ClusterIP|LoadBalancer]
+
+rbac:
+  # Specifies whether RBAC resources should be created
+  create: true
+
+serviceAccount:
+  # Specifies whether a ServiceAccount should be created
+  create: true
+  # The name of the ServiceAccount to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+## Configure resource requests and limits
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
+resources:
+  server:
+    requests:
+      memory: 200Mi
+      cpu: 100m
+    limits:
+      memory: 700Mi
+      cpu: 100m
+  sentinel:
+    requests:
+      memory: 200Mi
+      cpu: 100m
+    limits:
+      memory: 200Mi
+      cpu: 100m

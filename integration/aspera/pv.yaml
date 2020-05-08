@@ -1,0 +1,46 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: asp1
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+  - ReadWriteMany
+  nfs:
+    path: /data/asp1
+    server: 9.9.9.9
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: nfs
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: asp2
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+  - ReadWriteMany
+  nfs:
+    path: /data/asp2
+    server: 9.9.9.9
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: nfs
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: asp3
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+  - ReadWriteMany
+  nfs:
+    path: /data/asp3
+    server: 9.9.9.9
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: nfs

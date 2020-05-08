@@ -1,0 +1,9 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: cp4i-setup-source
+spec:
+  params:
+  - name: url
+    value: https://github.ibm.com/rsundara/cp4i-setup
+  type: git

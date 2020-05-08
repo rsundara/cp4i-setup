@@ -1,0 +1,27 @@
+###############################################################################
+# Licensed Materials - Property of IBM.
+# Copyright IBM Corporation 2018. All Rights Reserved.
+# U.S. Government Users Restricted Rights - Use, duplication or disclosure
+# restricted by GSA ADP Schedule Contract with IBM Corp.
+#
+# Contributors:
+#  IBM Corporation - initial API and implementation
+###############################################################################
+
+# This service is not to be used to connect to redis instances.
+# It is here just to make linter happy.
+# For connection to redis use <redis name>-server-svc service
+{{- include "sch.config.init" (list . "ibm-wcd-redis.sch.chart.config.values") }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "sch.names.fullCompName" (list . .sch.chart.components.server) | quote }}
+  labels:
+{{  include "sch.metadata.labels.standard" (list . .sch.chart.components.server) | indent 4 }}
+spec:
+  ports:
+  - port: 6379
+    protocol: TCP
+    targetPort: 6379
+  selector:
+    service: {{ include "sch.names.fullCompName" (list . .sch.chart.components.server) }}

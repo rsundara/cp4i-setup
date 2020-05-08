@@ -1,0 +1,84 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: install-integration-instance
+spec:
+  inputs:
+    resources:
+    - name: source
+      type: git
+    params:
+    - name: integrationComponent
+      default: integration/tracing
+      description: The integration component that needs to be installed.
+    - name: env
+      default: "dev"
+      description: Specfiy the current environment. It is used in computing the Helm release name.
+    - name: production
+      default: "false"
+      description: Specifies if the deployment is production-like with High Availability enabled. Default [false]
+      
+  steps:
+  - name: install-instance
+    image: docker.io/rsundara/cp4i-setup
+    workingdir: /workspace/source
+    env:
+      - name: INTEGRATION_COMPONENT
+        value: $(inputs.params.integrationComponent)
+      - name: IBMCLOUD_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: common-settings
+            key: password
+      - name: IBMCLOUD_USERNAME
+        valueFrom:
+          secretKeyRef:
+            name: common-settings
+            key: username
+      - name: CLUSTER
+        valueFrom:
+          secretKeyRef:
+            name: common-settings
+            key: url
+      - name: CLOUD_TYPE
+        valueFrom:
+          secretKeyRef:
+            name: common-settings
+            key: cloudType
+      - name: OFFLINE_INSTALL
+        valueFrom:
+          secretKeyRef:
+            name: common-settings
+            key: offlineInstall
+      - name: STORAGE_FILE
+        valueFrom:
+          secretKeyRef:
+            name: common-settings
+            key: fileStorage
+      - name: STORAGE_BLOCK
+        valueFrom:
+          secretKeyRef:
+            name: common-settings
+            key: blockStorage
+      - name: PRODUCTION
+        value: $(inputs.params.production)
+      - name: ENV
+        value: $(inputs.params.env)
+    command: ["/bin/sh"]
+    args:
+      - -c
+      - |
+        set -eu;
+        cloudctl login -a $CLUSTER -n integration -u $IBMCLOUD_USERNAME -p $IBMCLOUD_PASSWORD --skip-ssl-validation
+        echo Component      : $INTEGRATION_COMPONENT;
+        echo Cloud type     : $CLOUD_TYPE;
+        echo Production     : $PRODUCTION;
+        echo Offline        : $OFFLINE_INSTALL;
+        echo Environment    : $ENV;
+        echo File  Storage  : $STORAGE_FILE;
+        echo Block Storage  : $STORAGE_BLOCK;
+        cd $INTEGRATION_COMPONENT;
+        echo "Running setup.sh";
+        sh setup.sh
+        echo "Running install.sh";
+        sh install.sh;

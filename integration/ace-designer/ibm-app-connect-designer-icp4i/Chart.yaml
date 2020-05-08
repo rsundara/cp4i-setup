@@ -1,0 +1,21 @@
+appVersion: 11.0.0.7
+description: IBM App Connect Designer
+icon: https://raw.githubusercontent.com/ot4i/ace-docker/master/app_connect_light_256x256.png
+keywords:
+- Commercial
+- amd64
+- ICPRHOCP
+- ICPROKS
+- ACE
+- Integration
+- IIB
+- WMB
+- MQSI
+- Websphere
+- Message
+- Broker
+- Bus
+kubeVersion: '>=1.11.0'
+name: ibm-app-connect-designer-icp4i
+tillerVersion: '>=2.10.0'
+version: 3.1.0

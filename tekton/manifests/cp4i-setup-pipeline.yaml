@@ -1,0 +1,794 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: install-all
+spec:
+  resources:
+    - name: source
+      type: git
+  params:
+    - name: production
+      default: "false"
+      description: Specifies if the deployment is production-like with High Availability enabled. Default [false]
+    - name: env
+      default: "dev"
+      description: Specfiy the current environment. It is used in computing the Helm release name.
+  tasks:
+  - name: install-tracing
+    taskRef:
+      name: install-integration-instance
+    params:
+    - name: production
+      value: $(params.production)
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/tracing
+    resources:
+      inputs:
+      - name: source
+        resource: source
+  - name: install-ace-dashboard
+    taskRef:
+      name: install-integration-instance
+    params:
+    - name: production
+      value: $(params.production)
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/ace-dashboard
+    resources:
+      inputs:
+      - name: source
+        resource: source
+    runAfter:
+    - install-tracing
+  - name: install-ace-designer
+    taskRef:
+      name: install-integration-instance
+    params:
+    - name: production
+      value: $(params.production)
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/ace-designer
+    resources:
+      inputs:
+      - name: source
+        resource: source
+    runAfter:
+    - install-ace-dashboard
+  - name: install-datapower
+    taskRef:
+      name: install-integration-instance
+    params:
+    - name: production
+      value: $(params.production)
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/datapower
+    resources:
+      inputs:
+      - name: source
+        resource: source
+    runAfter:
+    - install-ace-designer
+  - name: install-mq
+    taskRef:
+      name: install-integration-instance
+    params:
+    - name: production
+      value: $(params.production)
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/mq
+    resources:
+      inputs:
+      - name: source
+        resource: source
+    runAfter:
+    - install-datapower
+  - name: install-assetrepo
+    taskRef:
+      name: install-integration-instance
+    params:
+    - name: production
+      value: $(params.production)
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/assetrepo
+    resources:
+      inputs:
+      - name: source
+        resource: source
+    runAfter:
+    - install-mq
+  - name: install-apic
+    taskRef:
+      name: install-integration-instance
+    params:
+    - name: production
+      value: $(params.production)
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/apic
+    resources:
+      inputs:
+      - name: source
+        resource: source
+    runAfter:
+    - install-assetrepo
+  - name: install-eventstreams
+    taskRef:
+      name: install-integration-instance
+    params:
+    - name: production
+      value: $(params.production)
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/eventstreams
+    resources:
+      inputs:
+      - name: source
+        resource: source
+    runAfter:
+    - install-apic
+  - name: install-aspera
+    taskRef:
+      name: install-integration-instance
+    params:
+    - name: production
+      value: $(params.production)
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/aspera
+    resources:
+      inputs:
+      - name: source
+        resource: source
+    runAfter:
+    - install-eventstreams
+      
+---
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: uninstall-all
+spec:
+  resources:
+    - name: source
+      type: git
+  params:
+    - name: env
+      default: "dev"
+  tasks:
+  - name: uninstall-tracing
+    taskRef:
+      name: uninstall-integration-instance
+    params:
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/tracing
+    resources:
+      inputs:
+      - name: source
+        resource: source  
+  - name: uninstall-ace-dashboard
+    taskRef:
+      name: uninstall-integration-instance
+    params:
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/ace-dashboard
+    resources:
+      inputs:
+      - name: source
+        resource: source  
+  - name: uninstall-ace-designer
+    taskRef:
+      name: uninstall-integration-instance
+    params:
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/ace-designer
+    resources:
+      inputs:
+      - name: source
+        resource: source 
+  - name: uninstall-datapower
+    taskRef:
+      name: uninstall-integration-instance
+    params:
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/datapower
+    resources:
+      inputs:
+      - name: source
+        resource: source  
+  - name: uninstall-mq
+    taskRef:
+      name: uninstall-integration-instance
+    params:
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/mq
+    resources:
+      inputs:
+      - name: source
+        resource: source  
+  - name: uninstall-assetrepo
+    taskRef:
+      name: uninstall-integration-instance
+    params:
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/assetrepo
+    resources:
+      inputs:
+      - name: source
+        resource: source  
+  - name: uninstall-apic
+    taskRef:
+      name: uninstall-integration-instance
+    params:
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/apic
+    resources:
+      inputs:
+      - name: source
+        resource: source  
+  - name: uninstall-eventstreams
+    taskRef:
+      name: uninstall-integration-instance
+    params:
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/eventstreams
+    resources:
+      inputs:
+      - name: source
+        resource: source  
+  - name: uninstall-aspera
+    taskRef:
+      name: uninstall-integration-instance
+    params:
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/aspera
+    resources:
+      inputs:
+      - name: source
+        resource: source  
+---        
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: install-tracing
+spec:
+  resources:
+    - name: source
+      type: git
+  params:
+    - name: production
+      default: "false"
+      description: Specifies if the deployment is production-like with High Availability enabled. Default [false]
+    - name: env
+      default: "dev"
+      description: Specfiy the current environment. It is used in computing the Helm release name.
+  tasks:
+  - name: install-instance
+    taskRef:
+      name: install-integration-instance
+    params:
+    - name: production
+      value: $(params.production)
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/tracing
+    resources:
+      inputs:
+      - name: source
+        resource: source
+--- 
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: install-ace-dashboard
+spec:
+  resources:
+    - name: source
+      type: git
+  params:
+    - name: production
+      default: "false"
+      description: Specifies if the deployment is production-like with High Availability enabled. Default [false]
+    - name: env
+      default: "dev"
+      description: Specfiy the current environment. It is used in computing the Helm release name.
+  tasks:
+  - name: install-instance
+    taskRef:
+      name: install-integration-instance
+    params:
+    - name: production
+      value: $(params.production)
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/ace-dashboard
+    resources:
+      inputs:
+      - name: source
+        resource: source
+--- 
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: install-ace-designer
+spec:
+  resources:
+    - name: source
+      type: git
+  params:
+    - name: production
+      default: "false"
+      description: Specifies if the deployment is production-like with High Availability enabled. Default [false]
+    - name: env
+      default: "dev"
+      description: Specfiy the current environment. It is used in computing the Helm release name.
+  tasks:
+  - name: install-instance
+    taskRef:
+      name: install-integration-instance
+    params:
+    - name: production
+      value: $(params.production)
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/ace-designer
+    resources:
+      inputs:
+      - name: source
+        resource: source
+---        
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: install-datapower
+spec:
+  resources:
+    - name: source
+      type: git
+  params:
+    - name: production
+      default: "false"
+      description: Specifies if the deployment is production-like with High Availability enabled. Default [false]
+    - name: env
+      default: "dev"
+      description: Specfiy the current environment. It is used in computing the Helm release name.
+  tasks:
+  - name: install-instance
+    taskRef:
+      name: install-integration-instance
+    params:
+    - name: production
+      value: $(params.production)
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/datapower
+    resources:
+      inputs:
+      - name: source
+        resource: source
+---        
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: install-mq
+spec:
+  resources:
+    - name: source
+      type: git
+  params:
+    - name: production
+      default: "false"
+      description: Specifies if the deployment is production-like with High Availability enabled. Default [false]
+    - name: env
+      default: "dev"
+      description: Specfiy the current environment. It is used in computing the Helm release name.
+  tasks:
+  - name: install-instance
+    taskRef:
+      name: install-integration-instance
+    params:
+    - name: production
+      value: $(params.production)
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/mq
+    resources:
+      inputs:
+      - name: source
+        resource: source
+---        
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: install-assetrepo
+spec:
+  resources:
+    - name: source
+      type: git
+  params:
+    - name: production
+      default: "false"
+      description: Specifies if the deployment is production-like with High Availability enabled. Default [false]
+    - name: env
+      default: "dev"
+      description: Specfiy the current environment. It is used in computing the Helm release name.
+  tasks:
+  - name: install-instance
+    taskRef:
+      name: install-integration-instance
+    params:
+    - name: production
+      value: $(params.production)
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/assetrepo
+    resources:
+      inputs:
+      - name: source
+        resource: source
+---        
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: install-apic
+spec:
+  resources:
+    - name: source
+      type: git
+  params:
+    - name: production
+      default: "false"
+      description: Specifies if the deployment is production-like with High Availability enabled. Default [false]
+    - name: env
+      default: "dev"
+      description: Specfiy the current environment. It is used in computing the Helm release name.
+  tasks:
+  - name: install-instance
+    taskRef:
+      name: install-integration-instance
+    params:
+    - name: production
+      value: $(params.production)
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/apic
+    resources:
+      inputs:
+      - name: source
+        resource: source
+---        
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: install-eventstreams
+spec:
+  resources:
+    - name: source
+      type: git
+  params:
+    - name: production
+      default: "false"
+      description: Specifies if the deployment is production-like with High Availability enabled. Default [false]
+    - name: env
+      default: "dev"
+      description: Specfiy the current environment. It is used in computing the Helm release name.
+  tasks:
+  - name: install-instance
+    taskRef:
+      name: install-integration-instance
+    params:
+    - name: production
+      value: $(params.production)
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/eventstreams
+    resources:
+      inputs:
+      - name: source
+        resource: source
+---        
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: install-aspera
+spec:
+  resources:
+    - name: source
+      type: git
+  params:
+    - name: production
+      default: "false"
+      description: Specifies if the deployment is production-like with High Availability enabled. Default [false]
+    - name: env
+      default: "dev"
+      description: Specfiy the current environment. It is used in computing the Helm release name.
+  tasks:
+  - name: install-instance
+    taskRef:
+      name: install-integration-instance
+    params:
+    - name: production
+      value: $(params.production)
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/aspera
+    resources:
+      inputs:
+      - name: source
+        resource: source
+---        
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: uninstall-tracing
+spec:
+  resources:
+    - name: source
+      type: git
+  params:
+    - name: env
+      default: "dev"
+      description: Specfiy the current environment. It is used in computing the Helm release name.
+  tasks:
+  - name: uninstall-instance
+    taskRef:
+      name: uninstall-integration-instance
+    params:
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/tracing
+    resources:
+      inputs:
+      - name: source
+        resource: source  
+---        
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: uninstall-ace-dashboard
+spec:
+  resources:
+    - name: source
+      type: git
+  params:
+    - name: env
+      default: "dev"
+      description: Specfiy the current environment. It is used in computing the Helm release name.
+  tasks:
+  - name: uninstall-instance
+    taskRef:
+      name: uninstall-integration-instance
+    params:
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/ace-dashboard
+    resources:
+      inputs:
+      - name: source
+        resource: source 
+---        
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: uninstall-ace-designer
+spec:
+  resources:
+    - name: source
+      type: git
+  params:
+    - name: env
+      default: "dev"
+      description: Specfiy the current environment. It is used in computing the Helm release name.
+  tasks:
+  - name: uninstall-instance
+    taskRef:
+      name: uninstall-integration-instance
+    params:
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/ace-designer
+    resources:
+      inputs:
+      - name: source
+        resource: source  
+---        
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: uninstall-datapower
+spec:
+  resources:
+    - name: source
+      type: git
+  params:
+    - name: env
+      default: "dev"
+      description: Specfiy the current environment. It is used in computing the Helm release name.
+  tasks:
+  - name: uninstall-instance
+    taskRef:
+      name: uninstall-integration-instance
+    params:
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/datapower
+    resources:
+      inputs:
+      - name: source
+        resource: source  
+---        
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: uninstall-mq
+spec:
+  resources:
+    - name: source
+      type: git
+  params:
+    - name: env
+      default: "dev"
+      description: Specfiy the current environment. It is used in computing the Helm release name.
+  tasks:
+  - name: uninstall-instance
+    taskRef:
+      name: uninstall-integration-instance
+    params:
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/mq
+    resources:
+      inputs:
+      - name: source
+        resource: source  
+---        
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: uninstall-assetrepo
+spec:
+  resources:
+    - name: source
+      type: git
+  params:
+    - name: env
+      default: "dev"
+      description: Specfiy the current environment. It is used in computing the Helm release name.
+  tasks:
+  - name: uninstall-instance
+    taskRef:
+      name: uninstall-integration-instance
+    params:
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/assetrepo
+    resources:
+      inputs:
+      - name: source
+        resource: source  
+---        
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: uninstall-apic
+spec:
+  resources:
+    - name: source
+      type: git
+  params:
+    - name: env
+      default: "dev"
+      description: Specfiy the current environment. It is used in computing the Helm release name.
+  tasks:
+  - name: uninstall-instance
+    taskRef:
+      name: uninstall-integration-instance
+    params:
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/apic
+    resources:
+      inputs:
+      - name: source
+        resource: source  
+---        
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: uninstall-eventstreams
+spec:
+  resources:
+    - name: source
+      type: git
+  params:
+    - name: env
+      default: "dev"
+      description: Specfiy the current environment. It is used in computing the Helm release name.
+  tasks:
+  - name: uninstall-instance
+    taskRef:
+      name: uninstall-integration-instance
+    params:
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/eventstreams
+    resources:
+      inputs:
+      - name: source
+        resource: source  
+---        
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: uninstall-aspera
+spec:
+  resources:
+    - name: source
+      type: git
+  params:
+    - name: env
+      default: "dev"
+      description: Specfiy the current environment. It is used in computing the Helm release name.
+  tasks:
+  - name: uninstall-instance
+    taskRef:
+      name: uninstall-integration-instance
+    params:
+    - name: env
+      value: $(params.env)
+    - name: integrationComponent
+      value: integration/aspera
+    resources:
+      inputs:
+      - name: source
+        resource: source  
+---        

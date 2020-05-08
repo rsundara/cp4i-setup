@@ -1,0 +1,53 @@
+###############################################################################
+# Licensed Materials - Property of IBM.
+# Copyright IBM Corporation 2018. All Rights Reserved.
+# U.S. Government Users Restricted Rights - Use, duplication or disclosure
+# restricted by GSA ADP Schedule Contract with IBM Corp.
+#
+# Contributors:
+#  IBM Corporation - initial API and implementation
+###############################################################################
+{{- include "sch.config.init" (list . "ibm-wcd-redis.sch.chart.config.values") }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "sch.names.statefulSetName" (list . "master-test") | quote }}
+  labels:
+{{  include "sch.metadata.labels.standard" (list . "master-test") | indent 4 }}
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  affinity:
+{{- include "redis.nodeaffinity" . | indent 4 }}
+  restartPolicy: Never
+{{- if include "redis.pullSecret" . }}
+  imagePullSecrets:
+  - name: {{ include "redis.pullSecret" . | quote }}
+{{- end }}
+  hostNetwork: false
+  hostPID: false
+  hostIPC: false
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 8000
+  containers:
+    - name: master-test
+      image: {{ include "redis.image.server" . }}
+      imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+      securityContext:
+        privileged: false
+        readOnlyRootFilesystem: true
+        allowPrivilegeEscalation: false
+        runAsNonRoot: true
+        runAsUser: 8000
+        capabilities:
+          drop:
+          - ALL
+      command: ["redis-cli", "-h", "{{ include "sch.names.fullCompName" (list . .sch.chart.components.master) }}", "-p", "6379", "ping"]
+      resources:
+        requests:
+          memory: 100Mi
+          cpu: '.1'
+        limits:
+          memory: 200Mi
+          cpu: '.1'

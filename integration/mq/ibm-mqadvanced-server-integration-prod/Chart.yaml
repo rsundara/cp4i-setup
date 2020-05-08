@@ -1,0 +1,14 @@
+apiVersion: v1
+appVersion: 9.1.4.0
+description: IBM MQ queue manager for Cloud Pak for Integration
+icon: https://raw.githubusercontent.com/IBM/charts/master/logo/ibm-mq-blue-icon.png
+keywords:
+- ICPRHOCP
+- amd64
+- Commercial
+- message queue
+- Integration
+kubeVersion: '>=1.14.0'
+name: ibm-mqadvanced-server-integration-prod
+tillerVersion: '>=2.9.1'
+version: 6.0.0

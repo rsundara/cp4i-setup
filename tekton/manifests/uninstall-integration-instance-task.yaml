@@ -1,0 +1,69 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: uninstall-integration-instance
+spec:
+  inputs:
+    resources:
+    - name: source
+      type: git
+    params:
+    - name: integrationComponent
+      default: integration/tracing
+      description: The integration component that needs to be uninstalled.
+    - name: env
+      default: "dev"
+      description: Specfiy the current environment. It is used in computing the Helm release name.
+  steps:
+  - name: uninstall-instance
+    image: docker.io/rsundara/cp4i-setup
+    workingdir: /workspace/source
+    env:
+      - name: INTEGRATION_COMPONENT
+        value: $(inputs.params.integrationComponent)
+      - name: IBMCLOUD_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: common-settings
+            key: password
+      - name: IBMCLOUD_USERNAME
+        valueFrom:
+          secretKeyRef:
+            name: common-settings
+            key: username
+      - name: CLUSTER
+        valueFrom:
+          secretKeyRef:
+            name: common-settings
+            key: url
+      - name: CLOUD_TYPE
+        valueFrom:
+          secretKeyRef:
+            name: common-settings
+            key: cloudType
+      - name: STORAGE_FILE
+        valueFrom:
+          secretKeyRef:
+            name: common-settings
+            key: fileStorage
+      - name: STORAGE_BLOCK
+        valueFrom:
+          secretKeyRef:
+            name: common-settings
+            key: blockStorage
+      - name: ENV
+        value: $(inputs.params.env)
+    command: ["/bin/sh"]
+    args:
+      - -c
+      - |
+        set -eu;
+        cloudctl login -a $CLUSTER -n integration -u $IBMCLOUD_USERNAME -p $IBMCLOUD_PASSWORD --skip-ssl-validation
+        echo Component      : $INTEGRATION_COMPONENT;
+        echo Cloud type     : $CLOUD_TYPE;
+        echo File  Storage  : $STORAGE_FILE;
+        echo Block Storage  : $STORAGE_BLOCK;
+        
+        cd $INTEGRATION_COMPONENT;
+        echo "Running uninstall.sh";
+        sh uninstall.sh;

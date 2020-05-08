@@ -1,0 +1,154 @@
+apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
+metadata:
+  name: ibm-aspera-hsts-icp4i-scc
+allowHostDirVolumePlugin: false
+allowHostIPC: false
+allowHostNetwork: false
+allowHostPID: false
+allowPrivilegedContainer: false
+defaultAddCapabilities: []
+priority: 0
+requiredDropCapabilities: []
+readOnlyRootFilesystem: false
+allowedCapabilities: []
+allowHostPorts: true
+readOnlyRootFilesystem: false
+allowedCapabilities: []
+allowHostPorts: true
+seLinuxContext:
+  type: RunAsAny
+supplementalGroups:
+  type: MustRunAs
+  ranges:
+  - max: 65535
+    min: 1
+runAsUser:
+  type: MustRunAsNonRoot
+fsGroup:
+  type: MustRunAs
+  ranges:
+  - max: 65535
+    min: 1
+volumes:
+- configMap
+- downwardAPI
+- emptyDir
+- persistentVolumeClaim
+- projected
+- secret
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ibm-aspera-hsts-icp4i-clusterrole
+rules:
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ibm-aspera-hsts-icp4i-scc-aspera
+  namespace: aspera
+rules:
+- apiGroups:
+  - security.openshift.io
+  resourceNames:
+  - ibm-aspera-hsts-icp4i-scc
+  resources:
+  - securitycontextconstraints
+  verbs:
+  - use
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ibm-aspera-hsts-icp4i-scc-aspera
+  namespace: aspera
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ibm-aspera-hsts-icp4i-scc-aspera
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: system:serviceaccounts:aspera
+- kind: ServiceAccount
+  name: default
+  namespace: aspera
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ibm-aspera-hsts-icp4i-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "configmaps"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: [""]
+  resources: [secrets"]
+  verbs: ["get", "list", "watch"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: ibm-aspera-hsts-icp4i-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ibm-aspera-hsts-icp4i-role
+subjects:
+- kind: ServiceAccount
+  name: ibm-aspera-hsts-icp4i
+  namespace: "aspera"
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: ibm-aspera-hsts-icp4i-crb-aspera
+subjects:
+- kind: ServiceAccount
+  name: ibm-aspera-hsts-icp4i
+  namespace: "aspera"
+roleRef:
+  kind: ClusterRole
+  name: ibm-aspera-hsts-icp4i-clusterrole
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ServiceAccount
+imagePullSecrets:
+  - name: sa-aspera
+metadata:
+  name: ibm-aspera-hsts-icp4i
+  namespace: "aspera"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ibm-sch-secret-gen
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["list", "create", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ibm-sch-secret-gen
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ibm-sch-secret-gen
+subjects:
+- kind: ServiceAccount
+  name: ibm-sch-secret-gen
+  namespace: "aspera"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ibm-sch-secret-gen
+  namespace: "aspera"
