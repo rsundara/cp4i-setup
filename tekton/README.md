@@ -42,7 +42,7 @@ kubectl get route tekton-dashboard -n tekton-pipelines
 
 The script [createTektonResources.sh](./createTektonResources.sh) can be run to create the resources defined in the following manifests file. Also, the script [deleteTektonResources.sh](./deleteTektonResources.sh) can be run to delete the Tekton resources.
 
-* [cp4i-setup-secrets.yaml](./manifests/cp4i-setup-secrets.yaml)
+* [cp4i-setup-secrets-template.yaml](./manifests/cp4i-setup-secrets-template.yaml)
 * [cp4i-setup-resource.yaml](./manifests/cp4i-setup-resource.yaml)
 * [install-integration-instance-task.yaml](./manifests/install-integration-instance-task.yaml)
 * [uninstall-integration-instance-task.yaml](./manifests/uninstall-integration-instance-task.yaml)
@@ -50,45 +50,50 @@ The script [createTektonResources.sh](./createTektonResources.sh) can be run to 
 
 Note that the scripts are designed to create the Tekton resources in the project **cp4i-setup**
 
-The contents of the manifest file [cp4i-setup-secrets.yaml](./manifests/cp4i-setup-secrets.yaml) needs to be updated to suit the environment.
+The contents of the script file [initConfig.sh](./initConfig.sh) needs to be updated to suit the environment.
 
 ```
-apiVersion: v1
-kind: Secret
-metadata:
-  name: common-services
-data:
-  username: BASE64_ENCODE(COMMON_SERVICES_USER_ID)
-  password: BASE64_ENCODE(COMMON_SERVICES_USER_PASSWORD)
-  url: BASE64("icp-console.OCP_DOMAIN")
-  cloudType: BASE64_ENCODE("ibmcloud" or "onprem")
----
-apiVersion: v1
-data:
-  password: BASE64_ENCODE(API_KEY)
-  username: BASE64_ENCODE(GIT_USER_NAME)
-kind: Secret
-metadata:
-  annotations:
-    tekton.dev/git-0: https://github.ibm.com
-  labels:
-    serviceAccount: pipeline
-  name: git-secret
-type: kubernetes.io/basic-auth
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: docker-secret
-  annotations:
-    tekton.dev/docker-0:  image-registry.openshift-image-registry.svc:5000 # Described below
-type: kubernetes.io/basic-auth
-stringData:
-  username: USERID_USED_TO_LOGIN_TO_OPENSHIFT_CLUSTER
-  password: PASSWORD_TO_LOGIN_TO_OPENSHIFT_CLUSTER
+#!/usr/bin/env bash
+
+#
+# The following section needs to be completed to match the environment 
+#
+
+# User name to access the common services 
+COMMON_SERVICES_USERNAME=admin
+# Credentials to access the common services 
+COMMON_SERVICES_PASSWORD=xxx
+# End point of the common services 
+# Output of --> oc get routes -n kube-system | grep icp-console |  awk -F' ' '{print $2 }'
+COMMON_SERVICE_ENDPOINT=icp-console.xxx
+
+# cloudType is set to ibmcloud or onprem
+CLOUD_TYPE=ibmcloud
+
+# offLineInstall is set to true or false
+OFFLINE_INSTALL=false
+
+# fileStorage is set to "nfs" or "csi-cephfs" or "ibmc-file-gold" or "any RWX storage provider"
+FILE_STORAGE=ibmc-file-gold
+
+# blockStorage is set to "rook-ceph-block" or "ibmc-block-gold" or ""any RWO storage provider"
+BLOCK_STORAGE=ibmc-block-gold
+
+# Credentials to access git repository
+# API Key can be created using the link --> https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line
+GIT_USER_NAME=xxx
+GIT_API_KEY_OR_PASSWORD=xxx
+
+# Credentials to access OpenShift Cluster
+OPENSHIFT_CLUSTER_USERNAME=xxx
+OPENSHIFT_CLUSTER_PASSWORD=xxx
+
+#
+# End of configuration
+# 
 ```  
 
-Once the manifest file [cp4i-setup-secrets.yaml](./manifests/cp4i-setup-secrets.yaml) is updated the script [createTektonResources.sh](./createTektonResources.sh) can be run to create Tekton resources.
+Once the script file [initConfig.sh](./initConfig.sh) is updated the script [createTektonResources.sh](./createTektonResources.sh) can be run to create Tekton resources.
 
 Sample run is listed below:
 
